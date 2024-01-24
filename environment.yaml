@@ -1,0 +1,19 @@
+name: marine 
+channels:
+  - conda-forge
+  - pytorch
+  - nvidia
+dependencies:
+  - python
+  - pip
+  - pytorch
+  - pytorch-cuda=12.1
+  - aria2
+  - duckdb
+  - pandas
+  - fastparquet
+  - pyarrow
+  - matplotlib
+  - numpy
+  - jupyter
+  - ipython
