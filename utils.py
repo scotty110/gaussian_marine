@@ -10,12 +10,13 @@ from torch.utils.data import Dataset, DataLoader
 
 '''
 Data Loader
-Inputs:
-    - Partition Function
-    - Dataset
-    - Dataloader
+Functions:
+    - get_split: Get the indices for the training and testing data
+    - MarineDataset: Dataset class for the ncei marine data file that was process by data_explore.ipynb
+    - MarineDataLoader: Dataloader class for the ncei marine data file that was process by data_explore.ipynb
+    - partition_data: Partition the data into training and testing data
 '''
-def get_split(size:int, split:float) -> Tuple[np.ndarray, np.ndarray]:
+def get_split(size:int, split:float) -> tuple[np.ndarray, np.ndarray]:
     '''
     Split indecies into training and testing
     Inputs:
@@ -42,12 +43,21 @@ class MarineDataset(Dataset):
             - split (np.ndarray): Indices to use for dataset (will be split into train and test)
         '''
         df = pd.read_parquet(data_path)
+        df = df.dropna()
         self.data = df.iloc[split]
 
     def __len__(self):
         return len(self.data)
     
-    def __getitem__(self, idx):
+    def __getitem__(self, idx) -> tuple[torch.Tensor, torch.Tensor]:
+        '''
+        Get item for iterator, returns X, y pair from row idx
+        Inputs:
+            - idx (int): Index to get X, y pair from
+        Outputs:
+            - X (torch.Tensor): Input data
+            - y (torch.Tensor): Output data
+        '''
         row = self.data.iloc[idx].values
         X = torch.tensor([row['WindSpeed'], row['WetTemp'], row['SeaTemp'], row['CloudAmount'] ], dtype=torch.float64) # Actually select items TODO
         y = torch.tensor([row['AirTemp']], dtype=torch.float64)
@@ -72,7 +82,7 @@ class MarineDataLoader(DataLoader):
         return len(self.dataset) 
 
 
-def partition_data(data_path:str, split:float=0.3) -> Tuple[MarineDataLoader, MarineDataLoader]:
+def partition_data(data_path:str, split:float=0.3) -> tuple[MarineDataLoader, MarineDataLoader]:
     '''
     Partition the data into training and testing data
     Inputs:
@@ -84,11 +94,12 @@ def partition_data(data_path:str, split:float=0.3) -> Tuple[MarineDataLoader, Ma
     '''
     # Get the indices for the training and testing data
     df = pd.read_parquet(data_path)
+    df = df.dropna() # Drop rows with NaN values, do this in dataloader so... 
     train_indices, test_indices = get_split(len(df), split)
 
     # Create the dataloaders
-    train_loader = MarineDataloader(data_path, train_indices)
-    test_loader = MarineDataloader(data_path, test_indices)
+    train_loader = MarineDataLoader(data_path, train_indices)
+    test_loader = MarineDataLoader(data_path, test_indices)
     return train_loader, test_loader
 
 
