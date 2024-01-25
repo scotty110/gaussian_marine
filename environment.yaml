@@ -17,3 +17,5 @@ dependencies:
   - numpy
   - jupyter
   - ipython
+  - pip:
+    - gpytorch
