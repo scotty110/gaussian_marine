@@ -58,14 +58,14 @@ class MarineDataset(Dataset):
             - X (torch.Tensor): Input data
             - y (torch.Tensor): Output data
         '''
-        row = self.data.iloc[idx].values
+        row = self.data.iloc[idx].to_dict()
         X = torch.tensor([row['WindSpeed'], row['WetTemp'], row['SeaTemp'], row['CloudAmount'] ], dtype=torch.float64) # Actually select items TODO
         y = torch.tensor([row['AirTemp']], dtype=torch.float64)
         return X, y
 
 
 class MarineDataLoader(DataLoader):
-    def __init__(self, data_path:str, split:np.ndarray, batch_size:int=32, shuffle:bool=True, num_workers:int=0):
+    def __init__(self, data_path:str, split:np.ndarray, batch_size:int=256, shuffle:bool=True, num_workers:int=0):
         '''
         Simple dataloader class for the ncei marine data file that was process by data_explore.ipynb
         Inputs:
