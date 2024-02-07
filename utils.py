@@ -104,6 +104,27 @@ def partition_data(data_path:str, split:float=0.3) -> tuple[MarineDataLoader, Ma
 
 
 '''
+Want to try down sampling (Latin Hyper Cude, adaptive design) data to see if it helps with training
+'''
+def partition_df(df:pd.DataFrame, split:float=0.3) -> tuple[MarineDataLoader, MarineDataLoader]:
+    '''
+    Partition the data into training and testing data
+    Inputs:
+        - df (pd.DataFrame): Dataframe to use for the train and test dataloaders
+    Outputs:
+        - train_loader (MarineDataLoader): Dataloader for the training data
+        - test_loader (MarineDataLoader): Dataloader for the testing data
+    '''
+    # Get the indices for the training and testing data
+    df = df.dropna() # Drop rows with NaN values, do this in dataloader so... 
+    train_indices, test_indices = get_split(len(df), split)
+
+    # Create the split 
+    train_df = df.iloc[train_indices]
+    test_df = df.iloc[test_indices]
+    return train_df, test_df
+
+'''
 Model Training
 ''' 
 
